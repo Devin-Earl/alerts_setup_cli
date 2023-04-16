@@ -1,0 +1,16 @@
+{
+  "name": "alerts_cli",
+  "version": "1.0.0",
+  "description": "A CLI specfically designed to manage resource alerts in Azure",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "azure",
+    "cli",
+    "alerts"
+  ],
+  "author": "Devin Earl",
+  "license": "ISC"
+}
