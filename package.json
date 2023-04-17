@@ -12,5 +12,13 @@
     "alerts"
   ],
   "author": "Devin Earl",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "child_process": "^1.0.2",
+    "enquirer": "^2.3.6",
+    "fs": "^0.0.1-security",
+    "path": "^0.12.7",
+    "promisify": "^0.0.3",
+    "uuid": "^9.0.0"
+  }
 }
