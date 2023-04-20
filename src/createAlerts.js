@@ -42,6 +42,11 @@ const createAlerts = async () => {
     name: "scGroup",
     message: "Enter SC Group Name:",
   });
+const emailGroup = await prompt({
+  type: "input",
+  name: "emailGroup",
+  message: "Enter email group name for alerts to be sent to:",
+});
 
   const resources = JSON.parse(
     await az(
@@ -79,9 +84,6 @@ const createAlerts = async () => {
     const alertNameMemory = `${osType} memory utilization alert for ${vmName}`;
     const alertNameDisk = `${osType} disk utilization alert for ${vmName}`;
     const alertNamePing = `${osType} ping status alert for ${vmName}`;
-    const alertNameFileSystemWarning = `${osType} file system warning for ${vmName}`;
-    const alertNameFileSystemAlarm = `${osType} file system alarm for ${vmName}`;
-    const alertNamePatrol = `${osType} patrol agent down alert for ${vmName}`;
 
     // Create alerts
     await az(
@@ -91,4 +93,23 @@ const createAlerts = async () => {
     await az(
       `monitor metrics alert create -n "${alertNameMemory}" --description "${alertNameMemory}" --condition "max percentage memory < 98 for 10 minutes" --resource "${vmId}" --resource-group "${resourceGroup}" --subscription "${subscriptionId}" --window-size "10m" --evaluation-frequency "1m" --severity "2" --enabled true`
     );
+    await az(
+      `monitor metrics alert create -n "${alertNameDisk}" --description "${alertNameDisk}" --condition "max percentage disk < 98 for 10 minutes" --resource "${vmId}" --resource-group "${resourceGroup}" --subscription "${subscriptionId}" --window-size "10m" --evaluation-frequency "1m" --severity "2" --enabled true`
+    );
+    await az(
+      `monitor metrics alert create -n "${alertNamePing}" --description "${alertNamePing}" --condition "count < 1"  --metric "availabilityResults"  --resource "${vmId}" --resource-group "${resourceGroup}" --subscription "${subscriptionId}" --window-size "3m" --evaluation-frequency "1m" --severity "2" --enabled true`
+    );
     
+    // Create action group
+const actionGroupName = resourceGroup;
+await az(
+  `monitor action-group create --name "${actionGroupName}" --resource-group "${resourceGroup}" --short-name "${actionGroupName}" --email-receiver "<your-email-address>"`
+);
+
+// Assign alerts to action group
+await az(
+  `monitor metrics alert update --resource-group "${resourceGroup}" --ids $(az monitor metrics alert list --resource-group "${resourceGroup}" --query "[].id" --output tsv) --action "${actionGroupName}" --reset-actions`
+);
+}
+}
+module.exports = createAlerts;
